@@ -35,15 +35,11 @@ def run_command(command, pager=False, display_cmd=False):
         sys.exit(p.returncode)
 
 def _get_bgp_neighbors():
-    """Returns BGP neighbor dict from minigraph
+    """Returns BGP neighbor list from database
     """
-    proc = subprocess.Popen([SONIC_CFGGEN_PATH, '-m', MINIGRAPH_PATH, '--var-json', MINIGRAPH_BGP_SESSIONS],
-                            stdout=subprocess.PIPE,
-                            shell=False,
-                            stderr=subprocess.STDOUT)
-    stdout = proc.communicate()[0]
-    proc.wait()
-    return json.loads(stdout.rstrip('\n'))
+    config_db = ConfigDBConnector()
+    config_db.connect()
+    return config_db.get_table('BGP_NEIGHBOR').values()
 
 def _is_neighbor_ipaddress(ipaddress):
     """Returns True if a neighbor has the IP address <ipaddress>, False if not
